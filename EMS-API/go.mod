@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/lib/pq v1.12.3
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/text v0.39.0 // indirect
 )
