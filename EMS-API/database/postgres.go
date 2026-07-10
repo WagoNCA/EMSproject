@@ -10,7 +10,7 @@ import (
 var DB *sql.DB
 
 func Connect() {
-	connStr := "host=localhost port=5432 user=postgres password=postgres dbname=database sslmode=disable"
+	connStr := "host=localhost port=5432 user=admin password=adminer dbname=database sslmode=disable"
 
 	var err error
 

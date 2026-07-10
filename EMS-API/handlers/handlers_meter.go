@@ -21,7 +21,7 @@ func CreateMeter(c *echo.Context) error {
 	meter.ID = uuid.New().String()
 
 	query := `
-	INSERT INTO Meter (id, site_id, unit, type, created_at, updated_at)
+	INSERT INTO meter (id, site_id, unit, type, created_at, updated_at)
 	VALUES ($1, $2, $3, $4, NOW(), NOW())
 	`
 
@@ -43,7 +43,7 @@ func CreateMeter(c *echo.Context) error {
 func GetMetersBySiteID(c *echo.Context) error {
 	site_id := c.Param("site_id")
 
-	rows, err := database.DB.Query("SELECT id, name, type, site_id, created_at, updated_at FROM Meter WHERE site_id = $1", site_id)
+	rows, err := database.DB.Query("SELECT id, name, type, site_id, created_at, updated_at FROM meter WHERE site_id = $1", site_id)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve meters"})

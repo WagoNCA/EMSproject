@@ -22,7 +22,7 @@ CREATE TYPE meter_unit AS ENUM (
 );
 
 
-CREATE TABLE Site (
+CREATE TABLE site (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     address VARCHAR(255),
@@ -31,9 +31,9 @@ CREATE TABLE Site (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Meter (
+CREATE TABLE meter (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    site_id UUID REFERENCES Site(id),
+    site_id UUID REFERENCES site(id),
     type meter_type,
     unit meter_unit,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

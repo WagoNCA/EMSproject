@@ -20,7 +20,7 @@ func CreateSite(c *echo.Context) error {
 	site.ID = uuid.New().String()
 
 	query := `
-	INSERT INTO Site (id, name, address, type, created_at, updated_at)
+	INSERT INTO site (id, name, address, type, created_at, updated_at)
 	VALUES ($1, $2, $3, $4, NOW(), NOW())
 	`
 
@@ -40,10 +40,10 @@ func CreateSite(c *echo.Context) error {
 }
 
 func GetSites(c *echo.Context) error {
-	rows, err := database.DB.Query("SELECT id, name, address, type, created_at, updated_at FROM Site")
+	rows, err := database.DB.Query("SELECT id, name, address, type, created_at, updated_at FROM site")
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve sites"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	defer rows.Close()
@@ -66,7 +66,7 @@ func GetSiteByID(c *echo.Context) error {
 
 	var site models.Site
 
-	err := database.DB.QueryRow("SELECT id, name, address, type, created_at, updated_at FROM Site WHERE id = $1", site_id).Scan(
+	err := database.DB.QueryRow("SELECT id, name, address, type, created_at, updated_at FROM site WHERE id = $1", site_id).Scan(
 		&site.ID,
 		&site.Name,
 		&site.Address,
@@ -92,7 +92,7 @@ func UpdateSite(c *echo.Context) error {
 	}
 
 	query := `
-	UPDATE Site
+	UPDATE site
 	SET name = $1, address = $2, type = $3, updated_at = NOW()
 	WHERE id = $4
 	`
@@ -114,7 +114,7 @@ func UpdateSite(c *echo.Context) error {
 func DeleteSite(c *echo.Context) error {
 	site_id := c.Param("id")
 
-	_, err := database.DB.Exec("DELETE FROM Site WHERE id = $1", site_id)
+	_, err := database.DB.Exec("DELETE FROM site WHERE id = $1", site_id)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete site"})
