@@ -43,7 +43,7 @@ func CreateMeter(c *echo.Context) error {
 func GetMetersBySiteID(c *echo.Context) error {
 	site_id := c.Param("site_id")
 
-	rows, err := database.DB.Query("SELECT id, name, type, site_id, created_at, updated_at FROM meter WHERE site_id = $1", site_id)
+	rows, err := database.DB.Query("SELECT id, unit, type, site_id, created_at, updated_at FROM meter WHERE site_id = $1", site_id)
 
 	if err != nil {
 		return err
@@ -56,13 +56,13 @@ func GetMetersBySiteID(c *echo.Context) error {
 	for rows.Next() {
 		var meter models.Meter
 		if err := rows.Scan(&meter.ID, &meter.Unit, &meter.Type, &meter.SiteID, &meter.CreatedAt, &meter.UpdatedAt); err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to scan meter data"})
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 		meters = append(meters, meter)
 	}
 
 	if err := rows.Err(); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve meters"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, meters)
