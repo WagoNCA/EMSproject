@@ -48,14 +48,25 @@ func GetSites(c *echo.Context) error {
 
 	defer rows.Close()
 
-	var sites []models.Site
+	sites := make([]models.Site, 0)
 
 	for rows.Next() {
 		var site models.Site
-		if err := rows.Scan(&site.ID, &site.Name, &site.Address, &site.Type, &site.CreatedAt, &site.UpdatedAt); err != nil {
+		if err := rows.Scan(
+			&site.ID,
+			&site.Name,
+			&site.Address,
+			&site.Type,
+			&site.CreatedAt,
+			&site.UpdatedAt,
+		); err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to scan site data"})
 		}
 		sites = append(sites, site)
+	}
+
+	if err := rows.Err(); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error iterating rows"})
 	}
 
 	return c.JSON(http.StatusOK, sites)

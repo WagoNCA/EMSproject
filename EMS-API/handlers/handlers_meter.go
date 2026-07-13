@@ -61,6 +61,10 @@ func GetMetersBySiteID(c *echo.Context) error {
 		meters = append(meters, meter)
 	}
 
+	if err := rows.Err(); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve meters"})
+	}
+
 	return c.JSON(http.StatusOK, meters)
 }
 
