@@ -11,6 +11,8 @@ services:
       POSTGRES_PASSWORD: adminer
       POSTGRES_DB: database
 
+    
+
   influxdb:
     image: influxdb
     restart: always
