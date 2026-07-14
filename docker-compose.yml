@@ -19,13 +19,23 @@ services:
     image: influxdb
     restart: always
 
-  backend:
+  adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
     environment:
       ADMINER_DEFAULT_SERVER: postgres
+
+  backend:
+    depends_on:
+      - postgres
+    restart: always
+    ports:
+      - "8000:8000"
+    build:
+      context: .
+      dockerfile: Dockerfile
 
 volumes:
   postgres_data:

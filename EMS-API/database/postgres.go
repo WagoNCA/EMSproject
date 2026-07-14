@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -10,7 +11,7 @@ import (
 var DB *sql.DB
 
 func Connect() {
-	connStr := "host=localhost port=5432 user=admin password=adminer dbname=database sslmode=disable"
+	connStr := "host=postgres port=5432 user=admin password=adminer dbname=database sslmode=disable"
 
 	var err error
 
@@ -19,10 +20,16 @@ func Connect() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	err = DB.Ping()
-	if err != nil {
-		log.Fatal("Failed to ping database:", err)
+	for i := 0; i < 10; i++ {
+		err = DB.Ping()
+		if err == nil {
+			log.Println("Connected to database successfully")
+			return
+		}
+
+		log.Println("Waiting for database...")
+		time.Sleep(2 * time.Second)
 	}
 
-	log.Println("Connected to the database successfully")
+	log.Fatal("Failed to ping database:", err)
 }

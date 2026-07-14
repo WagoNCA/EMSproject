@@ -1,10 +1,9 @@
-
 FROM golang:1.26.4
 
 WORKDIR /app
 
-COPY . .
+COPY ./EMS-API .
 
-RUN go mod tidy
+RUN go build -mod=vendor -o ems-app .
 
-CMD ["go", "run", "helloEcho.go"]
+CMD ["go", "run", "-mod=vendor", "main.go"]
