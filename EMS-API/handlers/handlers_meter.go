@@ -34,7 +34,7 @@ func CreateMeter(c *echo.Context) error {
 	)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create meter"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusCreated, meter)
@@ -69,31 +69,31 @@ func GetMetersBySiteID(c *echo.Context) error {
 }
 
 func GetMeterByID(c *echo.Context) error {
-	meter_id := c.Param("id")
+	meter_id := c.Param("meter_id")
 
 	row := database.DB.QueryRow("SELECT id, site_id, unit, type, created_at, updated_at FROM Meter WHERE id = $1", meter_id)
 
 	var meter models.Meter
 	if err := row.Scan(&meter.ID, &meter.SiteID, &meter.Unit, &meter.Type, &meter.CreatedAt, &meter.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusNotFound, map[string]string{"error": "Meter not found"})
+			return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve meter"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, meter)
 }
 
 func UpdateMeter(c *echo.Context) error {
-	meter_id := c.Param("id")
+	meter_id := c.Param("meter_id")
 
 	var meter models.Meter
 	if err := c.Bind(&meter); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	query := `
-	UPDATE Meter
+	UPDATE meter
 	SET unit = $1, type = $2, site_id = $3, updated_at = NOW()
 	WHERE id = $4
 	`
@@ -107,37 +107,37 @@ func UpdateMeter(c *echo.Context) error {
 	)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update meter"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve rows affected"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	if rowsAffected == 0 {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Meter not found"})
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Meter updated successfully"})
 }
 
 func DeleteMeter(c *echo.Context) error {
-	meter_id := c.Param("id")
+	meter_id := c.Param("meter_id")
 
 	result, err := database.DB.Exec("DELETE FROM Meter WHERE id = $1", meter_id)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete meter"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve rows affected"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	if rowsAffected == 0 {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Meter not found"})
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Meter deleted successfully"})

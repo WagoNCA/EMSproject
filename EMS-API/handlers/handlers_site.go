@@ -73,7 +73,7 @@ func GetSites(c *echo.Context) error {
 }
 
 func GetSiteByID(c *echo.Context) error {
-	site_id := c.Param("id")
+	site_id := c.Param("site_id")
 
 	var site models.Site
 
@@ -87,19 +87,19 @@ func GetSiteByID(c *echo.Context) error {
 	)
 
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Site not found"})
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, site)
 }
 
 func UpdateSite(c *echo.Context) error {
-	site_id := c.Param("id")
+	site_id := c.Param("site_id")
 
 	var site models.Site
 
 	if err := c.Bind(&site); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	query := `
@@ -116,19 +116,19 @@ func UpdateSite(c *echo.Context) error {
 	)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update site"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, site)
 }
 
 func DeleteSite(c *echo.Context) error {
-	site_id := c.Param("id")
+	site_id := c.Param("site_id")
 
 	_, err := database.DB.Exec("DELETE FROM site WHERE id = $1", site_id)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete site"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Site deleted successfully"})
