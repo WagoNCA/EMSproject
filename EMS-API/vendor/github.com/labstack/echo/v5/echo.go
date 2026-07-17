@@ -110,6 +110,10 @@ type Echo struct {
 	// formParseMaxMemory is passed to Context for multipart form parsing (See http.Request.ParseMultipartForm)
 	formParseMaxMemory int64
 
+	// noGroupAutoRegisterRoutes is a flag that indicates whether echo.Group should NOT register 404 routes automatically
+	// when there are middlewares registered with the group.
+	noGroupAutoRegisterRoutes bool
+
 	enablePathUnescapingStaticFiles bool
 }
 
@@ -170,6 +174,9 @@ const (
 	PROPFIND = "PROPFIND"
 	// REPORT Method can be used to get information about a resource, see rfc 3253
 	REPORT = "REPORT"
+	// QUERY Method is a safe, idempotent request method carrying request content (a query) in its body, see rfc 10008.
+	// It is not (yet) part of the `net/http` standard library, so Echo defines it here.
+	QUERY = "QUERY"
 	// RouteNotFound is special method type for routes handling "route not found" (404) cases
 	RouteNotFound = "echo_route_not_found"
 	// RouteAny is special method type that matches any HTTP method in request. Any has lower
@@ -324,6 +331,12 @@ type Config struct {
 	//
 	// Applies to methods: Echo.Static, Echo.StaticFS, Group.Static, Group.StaticFS.
 	EnablePathUnescapingStaticFiles bool
+
+	// NoGroupAutoRegister404Routes bool is a flag that indicates whether echo.Group should NOT register 404 routes automatically
+	// when there are middlewares registered with the group.
+	// Note: if you decide not to register 404 routes automatically, make sure to check if all your middlewares are executed
+	// as expected. For example - CORS middleware.
+	NoGroupAutoRegister404Routes bool
 }
 
 // NewWithConfig creates an instance of Echo with given configuration.
@@ -364,6 +377,8 @@ func NewWithConfig(config Config) *Echo {
 	}
 	e.enablePathUnescapingStaticFiles = config.EnablePathUnescapingStaticFiles
 
+	e.noGroupAutoRegisterRoutes = config.NoGroupAutoRegister404Routes
+
 	return e
 }
 
@@ -380,7 +395,9 @@ func New() *Echo {
 	}
 
 	e.serveHTTPFunc = e.serveHTTP
-	e.router = NewRouter(RouterConfig{})
+	e.router = NewRouter(RouterConfig{
+		AllowOverwritingRoute: true,
+	})
 	e.HTTPErrorHandler = DefaultHTTPErrorHandler(false)
 	e.contextPool.New = func() any {
 		return newContext(nil, nil, e)
@@ -537,6 +554,12 @@ func (e *Echo) POST(path string, h HandlerFunc, m ...MiddlewareFunc) RouteInfo {
 // router with optional route-level middleware. Panics on error.
 func (e *Echo) PUT(path string, h HandlerFunc, m ...MiddlewareFunc) RouteInfo {
 	return e.Add(http.MethodPut, path, h, m...)
+}
+
+// QUERY registers a new QUERY route for a path with matching handler in the
+// router with optional route-level middleware. Panics on error.
+func (e *Echo) QUERY(path string, h HandlerFunc, m ...MiddlewareFunc) RouteInfo {
+	return e.Add(QUERY, path, h, m...)
 }
 
 // TRACE registers a new TRACE route for a path with matching handler in the
@@ -728,7 +751,11 @@ func (e *Echo) Add(method, path string, handler HandlerFunc, middleware ...Middl
 
 // Group creates a new router group with prefix and optional group-level middleware.
 func (e *Echo) Group(prefix string, m ...MiddlewareFunc) (g *Group) {
-	g = &Group{prefix: prefix, echo: e}
+	g = &Group{
+		prefix:               prefix,
+		echo:                 e,
+		noAutoRegisterRoutes: e.noGroupAutoRegisterRoutes,
+	}
 	g.Use(m...)
 	return
 }
