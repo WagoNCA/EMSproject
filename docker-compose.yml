@@ -19,17 +19,17 @@ services:
     image: influxdb:2.0.7
     restart: always
     ports:
-      - "8088:8088"
+      - "8086:8086"
 
     volumes:
       - influxdb_data:/var/lib/influxdb2
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
-      DOCKER_INFLUXDB_INIT_USERNAME: admin
-      DOCKER_INFLUXDB_INIT_PASSWORD: Adminer1234
-      DOCKER_INFLUXDB_INIT_ORG: wagonca
-      DOCKER_INFLUXDB_INIT_BUCKET: measurements
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: the_graal
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUX_USER}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN}
 
   adminer:
     image: adminer
