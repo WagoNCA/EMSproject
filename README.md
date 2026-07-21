@@ -11,6 +11,7 @@ Next, we can start up the EMS:
 * Open the terminal in the project folder
 * Use docker compose up --build (to start the services)
 * In any browser, copy paste this link : **localhost:8080**
+
 *It is the Adminer visualization to help you understand the relational database and every variable.*
 
 You can now use the methods in Yaak to work with the EMS tool.
@@ -27,9 +28,11 @@ For the meters, they can have one of the next 3 types:
 * Electricity
 * Water
 * Gas
+
 *The unit must be specified*
 
 To post data/values with Yaak, you must use the POST method on **localhost:8000/meters/:meter_id/readings**. In the JSON body you will need to specify wich **meter_id** you post the data, and what is the value. For example:
+
 *{*
   **"meter_id": "d69345c0-0853-48b7-ac58-6497c5ef350c",*
   *"value": 144*
@@ -48,8 +51,10 @@ The Grafana visualization is available on **localhost:3000**. In order to access
 * Activate the basic auth and configure the details with watever you put in the .env.example file
 * Same with the InfluxDB details
 * Click **Save & test**
+
 *You are good to go!*
 
 The InfluxDB UI visualization is available on **localhost:8086**. In order to access the database:
 * User and password are the same as in the .env.example file
+
 *You are good to go!*
